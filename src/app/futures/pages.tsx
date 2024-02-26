@@ -2,15 +2,15 @@ import React from 'react'
 
 import Header from '../header'
 
-function Backtests() {
+function Futures() {
   return (
     <div>
       <Header/>
       <div className='flex flex-row justify-center items-end h-80'>
-      <p>Backtests</p>
+      <p>Futures</p>
       </div>
       </div>
   )
 }
 
-export default Backtests
+export default Futures
