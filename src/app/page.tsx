@@ -1,9 +1,16 @@
-import Image from "next/image";
+import React from 'react'
 
-export default function Home() {
+import Header from './header'
+
+function Home() {
   return (
-    <div className="flex flex-col justify-center items-center h-screen">
-      <p>This is Home page</p>
-    </div>
-  );
+    <div>
+      <Header/>
+      <div className='flex flex-row justify-center items-end h-80'>
+      <p>Home</p>
+      </div>
+      </div>
+  )
 }
+
+export default Home

@@ -2,6 +2,16 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from '@/components/ui/mode-toggle';
+// import { Menubar } from '@radix-ui/react-menubar';
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+} from "@/components/ui/menubar"
 
 function Header() {
   return (
@@ -19,42 +29,122 @@ function Header() {
       </div>
 
       <div className='text-sm flex flex-wrap justify-start gap-5 my-6'>
-        <Link href='/'>
-        <Button variant="outline">Home</Button>
-        </Link>
-        <Link href='/news'>
-          <Button variant="outline">News</Button>
-        </Link>
-        <Link href='/screener'>
-          <Button variant="outline">Screener</Button>
-        </Link>
-        <Link href='/maps'>
-          <Button variant="outline">Maps</Button>
-        </Link>
-        <Link href='/groups'>
-          <Button variant="outline">Groups</Button>
-        </Link>
-        <Link href='/portfolio'>
-          <Button variant="outline">Portfolio</Button>
-        </Link>
-        <Link href='/insider'>
-          <Button variant="outline">Insider</Button>
-        </Link>
-        <Link href='/futures'>
-          <Button variant="outline">Futures</Button>
-        </Link>
-        <Link href='/forex'>
-          <Button variant="outline">Forex</Button>
-        </Link>
-        <Link href='/crypto'>
-          <Button variant="outline">Crypto</Button>
-        </Link>
-        <Link href='/backtests'>
-          <Button variant="outline">Backtests</Button>
-        </Link>
-        <Link href='/elite'>
-          <Button variant="outline">Elite</Button>
-        </Link>
+        {/* <Menubar/> */}
+        <Menubar>
+          <MenubarMenu>
+            <Link href="/homepage">
+              <MenubarTrigger>
+              Home
+              </MenubarTrigger>
+            </Link>
+          </MenubarMenu>
+            {/* <MenubarContent>
+            </MenubarContent> */}
+            <MenubarMenu>
+            <Link href="/news">
+              <MenubarTrigger>
+              News
+              </MenubarTrigger>
+            </Link>
+            </MenubarMenu>
+            
+            <MenubarMenu>
+            <Link href="/screener">
+              <MenubarTrigger>
+              Screener
+              </MenubarTrigger>
+            </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/news">
+                <MenubarTrigger>
+                  News
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/screener">
+                <MenubarTrigger>
+                 Screener
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/maps">
+                <MenubarTrigger>
+                 Maps
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/groups">
+                <MenubarTrigger>
+                 Groups
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/portfolio">
+                <MenubarTrigger>
+                 Portfolio
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/insider">
+                <MenubarTrigger>
+                 Insider
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/future">
+                <MenubarTrigger>
+                 Future
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/forex">
+                <MenubarTrigger>
+                 Forex
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/crypto">
+                <MenubarTrigger>
+                 Crypto
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/backtests">
+                <MenubarTrigger>
+                 Backtests
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+
+            <MenubarMenu>
+              <Link href="/elite">
+                <MenubarTrigger>
+                 Elite
+                </MenubarTrigger>
+              </Link>
+            </MenubarMenu>
+             
+    </Menubar>
       </div>
       </div>
   );
