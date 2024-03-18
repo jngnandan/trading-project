@@ -1,5 +1,4 @@
 "use client"
-
 import React from 'react'
 
 import Header from '../header'
@@ -50,6 +49,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
  
 const data: Payment[] = [
   {
@@ -149,9 +150,6 @@ export type Payment = {
   Change: string;
   Volume: number;
 };
-
- 
-
 
 
 export const columns: ColumnDef<Payment>[] = [
@@ -409,7 +407,20 @@ function Screener() {
       <Header/>
       <div className='flex flex-col justify-start h-80 mx-8'>
       
-      
+      <div className='flex flex-row justify-center mb-5'>
+        <Tabs defaultValue="descriptive" className="w-[400px]">
+        <TabsList>
+          <TabsTrigger value="descriptive">Descriptive</TabsTrigger>
+          <TabsTrigger value="fundamental">Fundamental</TabsTrigger>
+          <TabsTrigger value="technical">Technical</TabsTrigger>
+          <TabsTrigger value="etf">ETF</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
+        </TabsList>
+        {/* <TabsContent value="account">Make changes to your account here.</TabsContent>
+        <TabsContent value="password">Change your password here.</TabsContent> */}
+      </Tabs>
+
+      </div>
       <div className='grid grid-cols-5 space-around'>
         {/* 1 */}
         <div className='flex flex-col justify-end items-end gap-2'>
@@ -712,9 +723,6 @@ function Screener() {
       <div className='mt-8'>
         <DataTableDemo/>
       </div>
-
-
-
       
       </div>
       </div>
