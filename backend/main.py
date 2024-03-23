@@ -6,9 +6,10 @@ from pathlib import Path
 import yfinance as yf
 from pydantic import BaseModel, validator
 import math
+import logging
 
 # Database connection URL (replace with yours)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./stocks.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 # Create a metadata object (not strictly necessary, but good practice)
@@ -16,21 +17,29 @@ metadata = MetaData()
 
 # Define a table representing the existing schema (**no table creation here**)
 table = Table(
-    "stocks",  # Assuming the table name is 'stocks' (modify if different)
+    "stocks",
     metadata,
-    Column("ticker", String, primary_key=True),
-    Column("amount", Float),
-    Column("status", String),
-    Column("email", String),
-    Column("company", String),
-    Column("sector", String),
-    Column("industry", String),
-    Column("country", String),
-    Column("market", Float),
-    Column("pe", Float),
-    Column("price", Float),
-    Column("change", String),
-    Column("volume", Integer),
+    Column("Symbol", String, primary_key=True),
+    Column("Company", String),
+    Column("Industry", String),
+    Column("Sector", String),
+    Column("Market", String),
+    Column("PE", Float),
+    Column("EPS", Float),
+    Column("MarketCap", Float),
+    Column("BookValue", Float),
+    Column("DividendYield", Float),
+    Column("EBITDA", Float),
+    Column("PriceToSalesTrailing12Months", Float),
+    Column("FiftyTwoWeekHigh", Float),
+    Column("FiftyTwoWeekLow", Float),
+    Column("FiftyDayMovingAverage", Float),
+    Column("TwoHundredDayMovingAverage", Float),
+    Column("SharesOutstanding", Float),
+    Column("Price", Float),
+    Column("Quantity", Integer),
+    Column("Invested", Float),
+    Column("Weight", Float),
 )
 
 # Create a sessionmaker
@@ -58,10 +67,21 @@ class StockData(BaseModel):
     Industry: str
     Sector: str
     Market: str
-    PE: float | None
-    Price: float | None
+    PE: float | None = None
+    EPS: float | None = None
+    MarketCap: float | None = None
+    BookValue: float | None = None
+    DividendYield: float | None = None
+    EBITDA: float | None = None
+    PriceToSalesTrailing12Months: float | None = None
+    FiftyTwoWeekHigh: float | None = None
+    FiftyTwoWeekLow: float | None = None
+    FiftyDayMovingAverage: float | None = None
+    TwoHundredDayMovingAverage: float | None = None
+    SharesOutstanding: float | None = None
+    Price: float | None = None
     Quantity: int
-    Invested: float | None
+    Invested: float | None = None
     Weight: float
 
     @validator("*", pre=True)
@@ -69,6 +89,10 @@ class StockData(BaseModel):
         if isinstance(v, float) and math.isnan(v):
             return None
         return v
+
+# Configure logging
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 @app.get("/")
 async def root():
@@ -92,39 +116,64 @@ async def get_stocks():
     finally:
         db.close()
 
+
 @app.get("/yfinance")
 async def get_yfinance_stocks():
     try:
-        # Define the stock symbols
-        symbols = ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS",
-                   "HDFC.NS", "HINDUNILVR.NS", "SBIN.NS", "BAJFINANCE.NS", "BHARTIARTL.NS"]
-        
-        # Fetch stock data using yfinance
-        stock_data = yf.download(symbols, group_by="ticker", threads=True)
-        
-        # Process the stock data
+        # Define a list of NSE company symbols
+        nse_companies = [    "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "HDFC", "HINDUNILVR",    "SBIN", "BAJFINANCE", "BHARTIARTL", "KOTAKBANK", "AXISBANK", "LT",    "ITC", "HCLTECH", "MARUTI", "ASIANPAINT", "TITAN", "SUNPHARMA", "NESTLEIND",    "INDUSINDBK", "ONGC", "DMART", "BAJAJFINSV", "ULTRACEMCO", "BPCL", "CIPLA",    "BAJAJ-AUTO", "TECHM", "IOC", "NTPC", "HDFCLIFE", "POWERGRID", "DIVISLAB",    "GAIL", "BAJAJHLDNG", "SBILIFE", "DRREDDY", "HINDALCO", "GRASIM", "JSWSTEEL",    "WIPRO", "SHREECEM", "BRITANNIA", "COALINDIA", "ADANIPORTS", "UBL", "PIDILITIND",    "HDFCAMC", "IOC", "BHARTIARTL", "M&M", "TATAMOTORS", "TATASTEEL", "EICHERMOT",    "HEROMOTOCO", "HINDPETRO", "UPL", "BAJAJ-AUTO", "TATAMOTORS", "CIPLA", "M&M",    "TATASTEEL", "ONGC", "COALINDIA", "HINDALCO", "NTPC", "GAIL", "SUNPHARMA",    "JSWSTEEL", "BPCL", "IOC", "UPL", "CIPLA", "M&M", "HINDPETRO", "TECHM",    "DRREDDY", "HDFCLIFE", "BHARTIARTL", "WIPRO", "TCS", "SHREECEM", "POWERGRID",    "ITC", "DIVISLAB", "SBILIFE", "ASIANPAINT", "BRITANNIA", "HDFCBANK", "ADANIPORTS",    "LT", "AXISBANK", "INFY", "RELIANCE", "HINDUNILVR", "HCLTECH", "NESTLEIND",    "KOTAKBANK", "MARUTI", "TITAN", "HDFC", "ICICIBANK", "BAJFINANCE", "SBIN",    "HDFC", "ICICIBANK", "TCS", "HINDUNILVR", "RELIANCE", "HDFCBANK", "INFY",    "ICICIBANK", "HDFC", "HINDUNILVR", "SBIN", "BAJFINANCE", "BHARTIARTL",    "KOTAKBANK", "AXISBANK", "LT", "ITC", "HCLTECH", "MARUTI", "ASIANPAINT",    "TITAN", "SUNPHARMA", "NESTLEIND", "INDUSINDBK", "ONGC", "DMART", "BAJAJFINSV",    "ULTRACEMCO", "BPCL", "CIPLA", "BAJAJ-AUTO", "TECHM", "IOC", "NTPC",    "HDFCLIFE", "POWERGRID", "DIVISLAB", "GAIL", "BAJAJHLDNG", "SBILIFE", "DRREDDY",    "HINDALCO", "GRASIM", "JSWSTEEL", "WIPRO", "SHREECEM", "BRITANNIA", "COALINDIA",    "ADANIPORTS", "UBL", "PIDILITIND", "HDFCAMC", "IOC", "BHARTIARTL", "M&M",    "TATAMOTORS", "TATASTEEL", "EICHERMOT", "HEROMOTOCO", "HINDPETRO", "UPL",    "BAJAJ-AUTO", "TATAMOTORS", "CIPLA", "M&M", "TATASTEEL", "ONGC", "COALINDIA",    "HINDALCO", "NTPC", "GAIL", "SUNPHARMA", "JSWSTEEL", "BPCL", "IOC", "UPL",    "CIPLA", "M&M", "HINDPETRO", "TECHM", "DRREDDY", "HDFCLIFE", "BHARTIARTL",    "WIPRO", "TCS", "SHREECEM", "POWERGRID", "ITC", "DIVISLAB", "SBILIFE",    "ASIANPAINT", "BRITANNIA", "HDFCBANK", "ADANIPORTS", "LT", "AXISBANK",    "INFY", "RELIANCE", "HINDUNILVR", "HCLTECH", "NESTLEIND", "KOTAKBANK",    "MARUTI", "TITAN", "HDFC", "ICICIBANK", "BAJFINANCE", "SBIN"]
+
+
+        # Add ".NS" suffix to each company symbol
+        symbols = [symbol + ".NS" for symbol in nse_companies]
+
         processed_data = []
         for symbol in symbols:
-            stock = stock_data[symbol]
-            latest_data = stock.iloc[-1]
-            
-            stock_info = StockData(
-                Symbol=symbol,
-                Company=symbol.split(".")[0],
-                Industry="",  # Add industry information if available
-                Sector="",  # Add sector information if available
-                Market="NSE",
-                PE=latest_data["PE"] if "PE" in latest_data and not math.isnan(latest_data["PE"]) else None,
-                Price=latest_data["Close"] if not math.isnan(latest_data["Close"]) else None,
-                Quantity=1,  # Set a default quantity or fetch from your database
-                Invested=latest_data["Close"] if not math.isnan(latest_data["Close"]) else None,
-                Weight=0.0  # Set a default weight or calculate based on your criteria
-            )
-            processed_data.append(stock_info)
-        
+            try:
+                ticker = yf.Ticker(symbol)
+                stock_data = yf.download(symbol, group_by="ticker", threads=True)
+
+                if stock_data.empty:
+                    logger.warning(f"No data available for stock: {symbol}")
+                    continue
+
+                latest_data = stock_data.iloc[-1]
+                info = ticker.info
+
+                stock_info = StockData(
+                    Symbol=symbol,
+                    Company=symbol.split(".")[0],
+                    Industry=info.get("industry", ""),
+                    Sector=info.get("sector", ""),
+                    Market="NSE",
+                    PE=info.get("trailingPE", None),
+                    EPS=info.get("trailingEps", None),
+                    MarketCap=info.get("marketCap", None),
+                    BookValue=info.get("bookValue", None),
+                    DividendYield=info.get("dividendYield", None),
+                    EBITDA=info.get("ebitda", None),
+                    PriceToSalesTrailing12Months=info.get("priceToSalesTrailing12Months", None),
+                    FiftyTwoWeekHigh=info.get("fiftyTwoWeekHigh", None),
+                    FiftyTwoWeekLow=info.get("fiftyTwoWeekLow", None),
+                    FiftyDayMovingAverage=info.get("fiftyDayAverage", None),
+                    TwoHundredDayMovingAverage=info.get("twoHundredDayAverage", None),
+                    SharesOutstanding=info.get("sharesOutstanding", None),
+                    Price=latest_data["Close"] if not math.isnan(latest_data["Close"]) else None,
+                    Quantity=1,  # Set a default quantity or fetch from your database
+                    Invested=latest_data["Close"] if not math.isnan(latest_data["Close"]) else None,
+                    Weight=0.0  # Set a default weight or calculate based on your criteria
+                )
+                processed_data.append(stock_info)
+            except (KeyError, IndexError) as e:
+                logger.error(f"Error processing stock {symbol}: {str(e)}")
+            except (ConnectionError, MaxRetryError) as e:
+                logger.error(f"Error fetching data for stock {symbol}: {str(e)}")
+
         return processed_data
     except Exception as e:
+        logger.error(f"Error in get_yfinance_stocks endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+    
 
 if __name__ == "__main__":
     import uvicorn

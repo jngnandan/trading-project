@@ -1,8 +1,8 @@
-"use client"
-import React, { useEffect, useState } from 'react'
+"use client";
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import Header from '../header'
+import Header from '../header';
 
 import {
   Select,
@@ -10,13 +10,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 import {
   CaretSortIcon,
   ChevronDownIcon,
   DotsHorizontalIcon,
-} from "@radix-ui/react-icons"
+} from "@radix-ui/react-icons";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -28,10 +28,10 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
- 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@tanstack/react-table";
+
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -40,8 +40,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -49,45 +49,44 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export type Payment = {
-  id: number;
+  id: string;
   ticker: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
   Company: string;
   Sector: string;
   Industry: string;
-  Country: string;
-  Market: number;
-  PE: number;
-  Price: number;
-  Change: string;
-  Volume: number;
+  Market: string;
+  PE: number | null;
+  EPS: number | null;
+  MarketCap: number | null;
+  BookValue: number | null;
+  DividendYield: number | null;
+  EBITDA: number | null;
+  PriceToSalesTrailing12Months: number | null;
+  FiftyTwoWeekHigh: number | null;
+  FiftyTwoWeekLow: number | null;
+  FiftyDayMovingAverage: number | null;
+  TwoHundredDayMovingAverage: number | null;
+  SharesOutstanding: number | null;
+  Price: number | null;
+  Quantity: number;
+  Invested: number | null;
+  Weight: number;
 };
 
 export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "id",
     header: "id",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("id")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
     accessorKey: "ticker",
     header: "ticker",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("ticker")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
-    header: () => <div className="text-right">Email</div>,
-    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue("ticker")}</div>,
   },
   {
     accessorKey: "Company",
@@ -105,11 +104,6 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => <div className="text-right lowercase">{row.getValue("Industry")}</div>,
   },
   {
-    accessorKey: "Country",
-    header: () => <div className="text-right">Country</div>,
-    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("Country")}</div>,
-  },
-  {
     accessorKey: "Market",
     header: () => <div className="text-right">Market</div>,
     cell: ({ row }) => <div className="text-right lowercase">{row.getValue("Market")}</div>,
@@ -120,20 +114,75 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => <div className="text-right lowercase">{row.getValue("PE")}</div>,
   },
   {
+    accessorKey: "EPS",
+    header: () => <div className="text-right">EPS</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("EPS")}</div>,
+  },
+  {
+    accessorKey: "MarketCap",
+    header: () => <div className="text-right">Market Cap</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("MarketCap")}</div>,
+  },
+  {
+    accessorKey: "BookValue",
+    header: () => <div className="text-right">Book Value</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("BookValue")}</div>,
+  },
+  {
+    accessorKey: "DividendYield",
+    header: () => <div className="text-right">Dividend Yield</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("DividendYield")}</div>,
+  },
+  {
+    accessorKey: "EBITDA",
+    header: () => <div className="text-right">EBITDA</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("EBITDA")}</div>,
+  },
+  {
+    accessorKey: "PriceToSalesTrailing12Months",
+    header: () => <div className="text-right">Price to Sales Trailing 12 Months</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("PriceToSalesTrailing12Months")}</div>,
+  },
+  {
+    accessorKey: "FiftyTwoWeekHigh",
+    header: () => <div className="text-right">52 Week High</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("FiftyTwoWeekHigh")}</div>,
+  },
+  {
+    accessorKey: "FiftyTwoWeekLow",
+    header: () => <div className="text-right">52 Week Low</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("FiftyTwoWeekLow")}</div>,
+  },
+  {
+    accessorKey: "FiftyDayMovingAverage",
+    header: () => <div className="text-right">50 Day Moving Average</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("FiftyDayMovingAverage")}</div>,
+  },
+  {
+    accessorKey: "TwoHundredDayMovingAverage",
+    header: () => <div className="text-right">200 Day Moving Average</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("TwoHundredDayMovingAverage")}</div>,
+  },
+  {
+    accessorKey: "SharesOutstanding",
+    header: () => <div className="text-right">Shares Outstanding</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("SharesOutstanding")}</div>,
+  },
+  {
     accessorKey: "Price",
     header: () => <div className="text-right">Price</div>,
     cell: ({ row }) => <div className="text-right lowercase">{row.getValue("Price")}</div>,
   },
   {
-    accessorKey: "Change",
-    header: () => <div className="text-right">Change</div>,
-    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("Change")}</div>,
+    accessorKey: "Quantity",
+    header: () => <div className="text-right">Quantity</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("Quantity")}</div>,
   },
   {
-    accessorKey: "Volume",
-    header: () => <div className="text-right">Volume</div>,
+    accessorKey: "Invested",
+    header: () => <div className="text-right">Invested</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("Volume"));
+      const amount = row.getValue("Invested");
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
@@ -142,48 +191,24 @@ export const columns: ColumnDef<Payment>[] = [
     },
   },
   {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original
- 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
+    accessorKey: "Weight",
+    header: () => <div className="text-right">Weight</div>,
+    cell: ({ row }) => <div className="text-right lowercase">{row.getValue("Weight")}</div>,
   },
-]
- 
+];
+
 export function DataTableDemo() {
   const [stocks, setStocks] = useState([]);
 
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   useEffect(() => {
     const fetchStocks = async () => {
       try {
-        const response = await fetch('http://localhost:8000/stocks');
+        const response = await fetch('http://localhost:8000/stocks/');
         const data = await response.json();
         setStocks(data.stocks);
       } catch (error) {
@@ -195,20 +220,28 @@ export function DataTableDemo() {
   }, []);
 
   const mappedData = stocks.map((stock) => ({
-    id: stock.id,
-    ticker: stock.ticker,
-    amount: stock.amount,
-    status: stock.status,
-    email: stock.email,
-    Company: stock.company, // Assuming the property name in the data is 'company'
-    Sector: stock.sector, // Assuming the property name in the data is 'sector'
-    Industry: stock.industry, // Assuming the property name in the data is 'industry'
-    Country: stock.country, // Assuming the property name in the data is 'country'
-    Market: stock.market,
-    PE: stock.pe,
-    Price: stock.price,
-    Change: stock.change,
-    Volume: stock.volume,
+    id: stock.Symbol,
+    ticker: stock.Symbol,
+    Company: stock.Company,
+    Sector: stock.Sector,
+    Industry: stock.Industry,
+    Market: stock.Market,
+    PE: stock.PE,
+    EPS: stock.EPS,
+    MarketCap: stock.MarketCap,
+    BookValue: stock.BookValue,
+    DividendYield: stock.DividendYield,
+    EBITDA: stock.EBITDA,
+    PriceToSalesTrailing12Months: stock.PriceToSalesTrailing12Months,
+    FiftyTwoWeekHigh: stock.FiftyTwoWeekHigh,
+    FiftyTwoWeekLow: stock.FiftyTwoWeekLow,
+    FiftyDayMovingAverage: stock.FiftyDayMovingAverage,
+    TwoHundredDayMovingAverage: stock.TwoHundredDayMovingAverage,
+    SharesOutstanding: stock.SharesOutstanding,
+    Price: stock.Price,
+    Quantity: stock.Quantity,
+    Invested: stock.Invested,
+    Weight: stock.Weight,
   }));
 
   const table = useReactTable({
@@ -228,7 +261,7 @@ export function DataTableDemo() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
@@ -263,7 +296,7 @@ export function DataTableDemo() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -283,7 +316,7 @@ export function DataTableDemo() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -343,5 +376,5 @@ export function DataTableDemo() {
         </div>
       </div>
     </div>
-  )
+  );
 }
